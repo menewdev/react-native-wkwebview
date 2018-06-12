@@ -389,8 +389,32 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
   }
 }
 
+- (void)showCustomErrorDialog:(NSError *)error
+{
+  // localizedDescriptionがなぜか英語でしか取得出来ずどこの設定なのか不明なため次善策
+  NSLog(@"%@", error.localizedDescription);
+  if ([error code] == NSURLErrorNotConnectedToInternet) {
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"エラー発生"
+                                                    message:@"インターネット接続がオフラインのようです。"
+                                                   delegate:self
+                                          cancelButtonTitle:nil
+                                          otherButtonTitles:@"OK", nil];
+    [alert show];
+  } else if ([error code] != NSURLErrorCancelled) {
+    NSString *message = [NSString stringWithFormat:@"エラーが発生しました。\ndomain: %@, code: %ld", error.domain, error.code];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"エラー発生"
+                                                    message:message
+                                                   delegate:self
+                                          cancelButtonTitle:nil
+                                          otherButtonTitles:@"OK", nil];
+    [alert show];
+  }
+}
+
 - (void)webView:(__unused WKWebView *)webView didFailProvisionalNavigation:(__unused WKNavigation *)navigation withError:(NSError *)error
 {
+  [self showCustomErrorDialog: error];
+	
   if (_onLoadingError) {
     if ([error.domain isEqualToString:NSURLErrorDomain] && error.code == NSURLErrorCancelled) {
       // NSURLErrorCancelled is reported when a page has a redirect OR if you load
@@ -412,6 +436,21 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 
 - (void)webView:(WKWebView *)webView didFinishNavigation:(__unused WKNavigation *)navigation
 {
+    UIApplication *app = [UIApplication sharedApplication];
+    NSURL* url = webView.URL;
+
+    // レシピのページかどうか判定して必要な処理を行う
+    NSRange range = [url.absoluteString rangeOfString:@"menu.php"];
+    if(range.location != NSNotFound) {
+        /* レシピのページでの処理 */
+        // バックライト消灯を解除するプロパティをYESに
+        app.idleTimerDisabled = YES;
+    }else{
+        /* レシピのページ以外での処理 */
+        // スリープ機能ありに戻す
+        app.idleTimerDisabled = NO;
+    }
+	
   if (_messagingEnabled) {
     NSString *source = @"window.postMessage = function (data) { window.webkit.messageHandlers.reactNative.postMessage(data); }";
     [webView evaluateJavaScript:source completionHandler:nil];
@@ -427,6 +466,11 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
   else if (_onLoadingFinish && !webView.loading && ![webView.URL.absoluteString isEqualToString:@"about:blank"]) {
     _onLoadingFinish([self baseEvent]);
   }
+}
+
+- (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error
+{
+  [self showCustomErrorDialog: error];
 }
 
 #pragma mark - WKUIDelegate
