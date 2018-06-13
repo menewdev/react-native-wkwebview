@@ -391,24 +391,34 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 
 - (void)showCustomErrorDialog:(NSError *)error
 {
-  // localizedDescriptionがなぜか英語でしか取得出来ずどこの設定なのか不明なため次善策
-  NSLog(@"%@", error.localizedDescription);
-  if ([error code] == NSURLErrorNotConnectedToInternet) {
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"エラー発生"
-                                                    message:@"インターネット接続がオフラインのようです。"
-                                                   delegate:self
-                                          cancelButtonTitle:nil
-                                          otherButtonTitles:@"OK", nil];
-    [alert show];
-  } else if ([error code] != NSURLErrorCancelled) {
-    NSString *message = [NSString stringWithFormat:@"エラーが発生しました。\ndomain: %@, code: %ld", error.domain, error.code];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"エラー発生"
-                                                    message:message
-                                                   delegate:self
-                                          cancelButtonTitle:nil
-                                          otherButtonTitles:@"OK", nil];
-    [alert show];
+  NSLog(@"showCustomErrorDialog: %@", error.localizedDescription);
+  // localizedDescriptionがなぜか英語でしか取得出来ずどこの設定なのか不明なため次善策 → なぜか直ったのでコメントアウト
+  // if ([error code] == NSURLErrorNotConnectedToInternet) {
+  //   UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"エラー発生"
+  //                                                   message:@"インターネット接続がオフラインのようです。"
+  //                                                  delegate:self
+  //                                         cancelButtonTitle:nil
+  //                                         otherButtonTitles:@"OK", nil];
+  //   [alert show];
+  // } else if ([error code] != NSURLErrorCancelled) {
+  //   NSString *message = [NSString stringWithFormat:@"エラーが発生しました。\ndomain: %@, code: %ld", error.domain, error.code];
+  //   UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"エラー発生"
+  //                                                   message:message
+  //                                                  delegate:self
+  //                                         cancelButtonTitle:nil
+  //                                         otherButtonTitles:@"OK", nil];
+  //   [alert show];
+  // }
+  if ([error.domain isEqualToString:@"WebKitErrorDomain"] && error.code == 102) {
+    //フレームの読み込みが中断しました、を除外する
+    return;
   }
+  UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"エラー発生"
+                                                message:error.localizedDescription
+                                                delegate:self
+                                      cancelButtonTitle:nil
+                                      otherButtonTitles:@"OK", nil];
+  [alert show];
 }
 
 - (void)webView:(__unused WKWebView *)webView didFailProvisionalNavigation:(__unused WKNavigation *)navigation withError:(NSError *)error
