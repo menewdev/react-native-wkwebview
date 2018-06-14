@@ -9,9 +9,9 @@
 
 #import <WebKit/WebKit.h>
 
-@interface RCTWKWebViewManager () <RCTWKWebViewDelegate>
+static WKProcessPool *_processPool;
 
-@property (nonatomic, strong) WKProcessPool *processPool;
+@interface RCTWKWebViewManager () <RCTWKWebViewDelegate>
 
 @end
 
@@ -25,10 +25,10 @@ RCT_EXPORT_MODULE()
 
 - (UIView *)view
 {
-  if (self.processPool == nil) {
-    self.processPool = [[WKProcessPool alloc] init];
+  if (_processPool == nil) {
+    _processPool = [[WKProcessPool alloc] init];
   }
-  RCTWKWebView *webView = [[RCTWKWebView alloc] initWithProcessPool:self.processPool];
+  RCTWKWebView *webView = [[RCTWKWebView alloc] initWithProcessPool:_processPool];
   webView.delegate = self;
   return webView;
 }
