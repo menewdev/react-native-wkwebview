@@ -11,6 +11,8 @@
 
 @interface RCTWKWebViewManager () <RCTWKWebViewDelegate>
 
+@property (nonatomic, strong) WKProcessPool *processPool;
+
 @end
 
 @implementation RCTWKWebViewManager
@@ -23,7 +25,10 @@ RCT_EXPORT_MODULE()
 
 - (UIView *)view
 {
-  RCTWKWebView *webView = [[RCTWKWebView alloc] initWithProcessPool:[[WKProcessPool alloc] init]];
+  if (self.processPool == nil) {
+    self.processPool = [[WKProcessPool alloc] init];
+  }
+  RCTWKWebView *webView = [[RCTWKWebView alloc] initWithProcessPool:self.processPool];
   webView.delegate = self;
   return webView;
 }
