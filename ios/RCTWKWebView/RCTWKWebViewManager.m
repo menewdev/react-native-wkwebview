@@ -25,22 +25,6 @@ RCT_EXPORT_MODULE()
 
 - (UIView *)view
 {
-  NSHTTPCookie *reactNativeCookie = [NSHTTPCookie cookieWithProperties:@{NSHTTPCookieName: @"react_native",
-                                                                         NSHTTPCookieValue: @"true",
-                                                                         NSHTTPCookieDomain: @"app.menew.jp",
-                                                                         NSHTTPCookiePath: @"/",
-                                                                         NSHTTPCookieExpires: [NSDate distantFuture]}];
-  NSHTTPCookie *appFlgCookie = [NSHTTPCookie cookieWithProperties:@{NSHTTPCookieName: @"app_flg",
-                                                                    NSHTTPCookieValue: @"1",
-                                                                    NSHTTPCookieDomain: @"app.menew.jp",
-                                                                    NSHTTPCookiePath: @"/",
-                                                                    NSHTTPCookieExpires: [NSDate distantFuture]}];
-  // この方法ではWKWebViewのCookieは直接は更新されません
-  // react-native-wkwebviewは非公式にNSHTTPCookieStorageからCookieを取得し毎回リクエストヘッダに追加している模様なのでそれを利用しています
-  // react-native-wkwebviewのベースを更新する際には仕様の変更に十分注意して下さい
-  [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:reactNativeCookie];
-  [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:appFlgCookie];
-  
   if (_processPool == nil) {
     _processPool = [[WKProcessPool alloc] init];
   }
