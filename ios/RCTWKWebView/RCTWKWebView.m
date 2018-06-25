@@ -64,6 +64,13 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
     config.processPool = processPool;
     WKUserContentController* userController = [[WKUserContentController alloc]init];
     [userController addScriptMessageHandler:[[WeakScriptMessageDelegate alloc] initWithDelegate:self] name:@"reactNative"];
+
+    WKUserScript * cookieScript = [[WKUserScript alloc]
+                                   initWithSource: @"document.cookie = 'react_native=true; domain=app.menew.jp; expires=Fri, 31 Dec 9999 23:59:59 GMT';"
+                                                    "document.cookie = 'app_flg=1; domain=app.menew.jp; expires=Fri, 31 Dec 9999 23:59:59 GMT';"
+                                   injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:NO];
+    [userController addUserScript:cookieScript];
+
     config.userContentController = userController;
 
     _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration:config];
