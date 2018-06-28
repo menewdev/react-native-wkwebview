@@ -32,6 +32,7 @@
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingError;
 @property (nonatomic, copy) RCTDirectEventBlock onShouldStartLoadWithRequest;
 @property (nonatomic, copy) RCTDirectEventBlock onProgress;
+@property (nonatomic, copy) RCTDirectEventBlock onLoadingChange;
 @property (nonatomic, copy) RCTDirectEventBlock onMessage;
 @property (nonatomic, copy) RCTDirectEventBlock onScroll;
 @property (assign) BOOL sendCookies;
@@ -79,6 +80,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
     _webView.navigationDelegate = self;
     _webView.scrollView.delegate = self;
     [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionNew context:nil];
+    [_webView addObserver:self forKeyPath:@"loading" options:NSKeyValueObservingOptionNew context:nil];
     [self addSubview:_webView];
   }
   return self;
@@ -165,6 +167,13 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
   [_webView evaluateJavaScript:source completionHandler:nil];
 }
 
+
+- (void)forceOnLoadingChange
+{
+  if (_onLoadingChange) {
+    _onLoadingChange(@{@"loading": [NSNumber numberWithBool:_webView.loading]});
+  }
+}
 
 - (void)goBack
 {
@@ -303,6 +312,10 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
       return;
     }
     _onProgress(@{@"progress": [change objectForKey:NSKeyValueChangeNewKey]});
+  } else if ([keyPath isEqualToString:@"loading"]) {
+    if (_onLoadingChange) {
+      _onLoadingChange(@{@"loading": [change objectForKey:NSKeyValueChangeNewKey]});
+    }
   }
 }
 
@@ -310,6 +323,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 {
   @try {
     [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
+    [_webView removeObserver:self forKeyPath:@"loading"];
   }
   @catch (NSException * __unused exception) {}
 }

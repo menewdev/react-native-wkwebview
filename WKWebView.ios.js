@@ -149,6 +149,9 @@ class WKWebView extends React.Component {
      * Report the progress
      */
     onProgress: PropTypes.func,
+
+    onLoadingChange: PropTypes.func,
+    
     /**
      * A function that is invoked when the webview calls `window.postMessage`.
      * Setting this property will inject a `postMessage` global into your
@@ -302,6 +305,7 @@ class WKWebView extends React.Component {
         onLoadingError={this._onLoadingError}
         messagingEnabled={messagingEnabled}
         onProgress={this._onProgress}
+        onLoadingChange={this._onLoadingChange}
         onMessage={this._onMessage}
         onScroll={this._onScroll}
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
@@ -316,6 +320,15 @@ class WKWebView extends React.Component {
       </View>
     );
   }
+
+
+  forceOnLoadingChange = () => {
+    UIManager.dispatchViewManagerCommand(
+      this.getWebViewHandle(),
+      UIManager.RCTWKWebView.Commands.forceOnLoadingChange,
+      null
+    );
+  };
 
   /**
    * Go forward one page in the webview's history.
@@ -446,6 +459,11 @@ class WKWebView extends React.Component {
   _onProgress = (event: Event) => {
     const onProgress = this.props.onProgress;
     onProgress && onProgress(event.nativeEvent.progress);
+  };
+
+  _onLoadingChange = (event: Event) => {
+    const onLoadingChange = this.props.onLoadingChange;
+    onLoadingChange && onLoadingChange(event.nativeEvent.loading);
   };
 
   _onMessage = (event: Event) => {

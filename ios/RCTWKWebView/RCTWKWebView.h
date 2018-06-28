@@ -35,6 +35,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, assign) BOOL hideKeyboardAccessoryView;
 
 
+- (void)forceOnLoadingChange;
 - (void)goForward;
 - (void)goBack;
 - (BOOL)canGoBack;

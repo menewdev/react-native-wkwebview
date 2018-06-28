@@ -48,6 +48,7 @@ RCT_EXPORT_VIEW_PROPERTY(onLoadingFinish, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onLoadingError, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onShouldStartLoadWithRequest, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onProgress, RCTDirectEventBlock)
+RCT_EXPORT_VIEW_PROPERTY(onLoadingChange, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onMessage, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onScroll, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(hideKeyboardAccessoryView, BOOL)
@@ -56,6 +57,18 @@ RCT_EXPORT_VIEW_PROPERTY(messagingEnabled, BOOL)
 RCT_REMAP_VIEW_PROPERTY(allowsLinkPreview, _webView.allowsLinkPreview, BOOL)
 #endif
 
+
+RCT_EXPORT_METHOD(forceOnLoadingChange:(nonnull NSNumber *)reactTag)
+{
+  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RCTWKWebView *> *viewRegistry) {
+    RCTWKWebView *view = viewRegistry[reactTag];
+    if (![view isKindOfClass:[RCTWKWebView class]]) {
+      RCTLogError(@"Invalid view returned from registry, expecting RCTWKWebView, got: %@", view);
+    } else {
+      [view forceOnLoadingChange];
+    }
+  }];
+}
 
 RCT_EXPORT_METHOD(goBack:(nonnull NSNumber *)reactTag)
 {
