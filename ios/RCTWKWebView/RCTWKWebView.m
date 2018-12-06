@@ -467,21 +467,6 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 
 - (void)webView:(WKWebView *)webView didFinishNavigation:(__unused WKNavigation *)navigation
 {
-    UIApplication *app = [UIApplication sharedApplication];
-    NSURL* url = webView.URL;
-
-    // レシピのページかどうか判定して必要な処理を行う
-    NSRange range = [url.absoluteString rangeOfString:@"menu.php"];
-    if(range.location != NSNotFound) {
-        /* レシピのページでの処理 */
-        // バックライト消灯を解除するプロパティをYESに
-        app.idleTimerDisabled = YES;
-    }else{
-        /* レシピのページ以外での処理 */
-        // スリープ機能ありに戻す
-        app.idleTimerDisabled = NO;
-    }
-	
   if (_messagingEnabled) {
     NSString *source = @"window.postMessage = function (data) { window.webkit.messageHandlers.reactNative.postMessage(data); }";
     [webView evaluateJavaScript:source completionHandler:nil];
