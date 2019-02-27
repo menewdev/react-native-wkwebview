@@ -401,13 +401,7 @@ class WKWebView extends React.Component {
   goForward = () => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      /* Backwards compatibility. See issue: #222 */
-      (
-        UIManager.getViewManagerConfig ? 
-        UIManager.getViewManagerConfig('CRAWKWebView') : 
-        UIManager.CRAWKWebView
-      )
-      .Commands.goForward,
+      this.getCRAWKWebView().Commands.goForward,
       null
     );
   };
@@ -418,13 +412,7 @@ class WKWebView extends React.Component {
   goBack = () => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      /* Backwards compatibility. See issue: #222 */
-      (
-        UIManager.getViewManagerConfig ? 
-        UIManager.getViewManagerConfig('CRAWKWebView') : 
-        UIManager.CRAWKWebView
-      )
-      .Commands.goBack,
+      this.getCRAWKWebView().Commands.goBack,
       null
     );
   };
@@ -450,13 +438,7 @@ class WKWebView extends React.Component {
     this.setState({ viewState: WebViewState.LOADING });
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      /* Backwards compatibility. See issue: #222 */
-      (
-        UIManager.getViewManagerConfig ? 
-        UIManager.getViewManagerConfig('CRAWKWebView') : 
-        UIManager.CRAWKWebView
-      )
-      .Commands.reload,
+      this.getCRAWKWebView().Commands.reload,
       null
     );
   };
@@ -467,13 +449,7 @@ class WKWebView extends React.Component {
   stopLoading = () => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      /* Backwards compatibility. See issue: #222 */
-      (
-        UIManager.getViewManagerConfig ? 
-        UIManager.getViewManagerConfig('CRAWKWebView') : 
-        UIManager.CRAWKWebView
-      )
-      .Commands.stopLoading,
+      this.getCRAWKWebView().Commands.stopLoading,
       null
     );
   };
@@ -491,13 +467,7 @@ class WKWebView extends React.Component {
   postMessage = data => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      /* Backwards compatibility. See issue: #222 */
-      (
-        UIManager.getViewManagerConfig ? 
-        UIManager.getViewManagerConfig('CRAWKWebView') : 
-        UIManager.CRAWKWebView
-      )
-      .Commands.postMessage,
+      this.getCRAWKWebView().Commands.postMessage,
       [String(data)]
     );
   };
@@ -514,6 +484,14 @@ class WKWebView extends React.Component {
     if (this.props.onNavigationStateChange) {
       this.props.onNavigationStateChange(event.nativeEvent);
     }
+  };
+
+  getCRAWKWebView = () => {
+    return (
+      UIManager.getViewManagerConfig ?
+      UIManager.getViewManagerConfig('CRAWKWebView') :
+      UIManager.CRAWKWebView
+    );
   };
 
   /**
