@@ -13,7 +13,6 @@
 #import <React/UIView+React.h>
 
 #import <objc/runtime.h>
-#import <Repro/Repro.h>
 
 // runtime trick to remove WKWebView keyboard default toolbar
 // see: http://stackoverflow.com/questions/19033292/ios-7-uiwebview-keyboard-issue/19042279#19042279
@@ -76,7 +75,6 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 
     _webView = [[WKWebView alloc] initWithFrame:self.bounds configuration:config];
     _webView.UIDelegate = self;
-    [Repro startWebViewTracking:self];
     _webView.navigationDelegate = self;
     _webView.scrollView.delegate = self;
     [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionNew context:nil];
