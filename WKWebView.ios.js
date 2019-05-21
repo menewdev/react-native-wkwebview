@@ -25,7 +25,7 @@ var BGWASH = 'rgba(255,255,255,0.8)';
 const WebViewState = keyMirror({
   IDLE: null,
   LOADING: null,
-  ERROR: null,
+  ERROR: null
 });
 
 const NavigationType = keyMirror({
@@ -34,16 +34,16 @@ const NavigationType = keyMirror({
   backforward: true,
   reload: true,
   formresubmit: true,
-  other: true,
+  other: true
 });
 
 const JSNavigationScheme = 'react-js-navigation';
 
 type ErrorEvent = {
-  domain: any;
-  code: any;
-  description: any;
-}
+  domain: any,
+  code: any,
+  description: any
+};
 
 type Event = Object;
 
@@ -53,8 +53,7 @@ const defaultRenderLoading = () => (
   </View>
 );
 const defaultRenderError = (errorDomain, errorCode, errorDesc) => (
-  <View style={styles.errorContainer}>
-  </View>
+  <View style={styles.errorContainer} />
 );
 
 /**
@@ -73,10 +72,7 @@ class WKWebView extends React.Component {
       'Use the `source` prop instead.'
     ),
 
-    url: deprecatedPropType(
-      PropTypes.string,
-      'Use the `source` prop instead.'
-    ),
+    url: deprecatedPropType(PropTypes.string, 'Use the `source` prop instead.'),
 
     /**
      * Loads static html or a uri (with optional headers) in the WebView.
@@ -103,7 +99,7 @@ class WKWebView extends React.Component {
          * additional encoding (e.g. URL-escaping or base64) applied.
          * NOTE: On Android, this can only be used with POST requests.
          */
-        body: PropTypes.string,
+        body: PropTypes.string
       }),
       PropTypes.shape({
         /*
@@ -113,12 +109,12 @@ class WKWebView extends React.Component {
         /*
          * The base URL to be used for any relative links in the HTML.
          */
-        baseUrl: PropTypes.string,
+        baseUrl: PropTypes.string
       }),
       /*
        * Used internally by packager.
        */
-      PropTypes.number,
+      PropTypes.number
     ]),
 
     /**
@@ -130,7 +126,7 @@ class WKWebView extends React.Component {
       'automatic',
       'scrollableAxes',
       'never', // default
-      'always',
+      'always'
     ]),
 
     /**
@@ -163,7 +159,7 @@ class WKWebView extends React.Component {
     onProgress: PropTypes.func,
 
     onLoadingChange: PropTypes.func,
-    
+
     /**
      * A function that is invoked when the webview calls `window.postMessage`.
      * Setting this property will inject a `postMessage` global into your
@@ -243,16 +239,16 @@ class WKWebView extends React.Component {
     allowsLinkPreview: PropTypes.bool,
     /**
      * Sets the customized user agent by using of the WKWebView
-    */
+     */
     customUserAgent: PropTypes.string,
     userAgent: PropTypes.string,
     /**
      * A Boolean value that determines whether paging is enabled for the scroll view.
-    */
+     */
     pagingEnabled: PropTypes.bool,
     /**
      * A Boolean value that sets whether diagonal scrolling is allowed.
-    */
+     */
     directionalLockEnabled: PropTypes.bool,
     /*
      * The manner in which the keyboard is dismissed when a drag begins in the
@@ -261,14 +257,14 @@ class WKWebView extends React.Component {
     keyboardDismissMode: PropTypes.oneOf([
       'none', // Default
       'on-drag',
-      'interactive', // iOS only
-    ]),
+      'interactive' // iOS only
+    ])
   };
 
   state = {
     viewState: WebViewState.IDLE,
     lastErrorEvent: (null: ?ErrorEvent),
-    startInLoadingState: true,
+    startInLoadingState: true
   };
 
   componentWillMount() {
@@ -284,10 +280,7 @@ class WKWebView extends React.Component {
       otherView = (this.props.renderLoading || defaultRenderLoading)();
     } else if (this.state.viewState === WebViewState.ERROR) {
       const errorEvent = this.state.lastErrorEvent;
-      invariant(
-        errorEvent != null,
-        'lastErrorEvent expected to be non-null'
-      );
+      invariant(errorEvent != null, 'lastErrorEvent expected to be non-null');
       otherView = (this.props.renderError || defaultRenderError)(
         errorEvent.domain,
         errorEvent.code,
@@ -300,17 +293,25 @@ class WKWebView extends React.Component {
     }
 
     const webViewStyles = [styles.container, styles.webView, this.props.style];
-    if (this.state.viewState === WebViewState.LOADING ||
-      this.state.viewState === WebViewState.ERROR) {
+    if (
+      this.state.viewState === WebViewState.LOADING ||
+      this.state.viewState === WebViewState.ERROR
+    ) {
       // if we're in either LOADING or ERROR states, don't show the webView
       webViewStyles.push(styles.hidden);
     }
 
-    const onShouldStartLoadWithRequest = this.props.onShouldStartLoadWithRequest && ((event: Event) => {
-      const shouldStart = this.props.onShouldStartLoadWithRequest &&
-        this.props.onShouldStartLoadWithRequest(event.nativeEvent);
-      WKWebViewManager.startLoadWithResult(!!shouldStart, event.nativeEvent.lockIdentifier);
-    });
+    const onShouldStartLoadWithRequest =
+      this.props.onShouldStartLoadWithRequest &&
+      ((event: Event) => {
+        const shouldStart =
+          this.props.onShouldStartLoadWithRequest &&
+          this.props.onShouldStartLoadWithRequest(event.nativeEvent);
+        WKWebViewManager.startLoadWithResult(
+          !!shouldStart,
+          event.nativeEvent.lockIdentifier
+        );
+      });
 
     let source = this.props.source;
     if (this.props.source && typeof this.props.source === 'object') {
@@ -328,25 +329,39 @@ class WKWebView extends React.Component {
 
     const messagingEnabled = typeof this.props.onMessage === 'function';
 
-    const webView =
+    const webView = (
       <CRAWKWebView
-        ref={ref => { this.webview = ref; }}
+        ref={ref => {
+          this.webview = ref;
+        }}
         key="webViewKey"
         style={webViewStyles}
-        contentInsetAdjustmentBehavior={this.props.contentInsetAdjustmentBehavior}
+        contentInsetAdjustmentBehavior={
+          this.props.contentInsetAdjustmentBehavior
+        }
         source={resolveAssetSource(source)}
-        injectJavaScriptForMainFrameOnly={this.props.injectJavaScriptForMainFrameOnly}
-        injectedJavaScriptForMainFrameOnly={this.props.injectedJavaScriptForMainFrameOnly}
+        injectJavaScriptForMainFrameOnly={
+          this.props.injectJavaScriptForMainFrameOnly
+        }
+        injectedJavaScriptForMainFrameOnly={
+          this.props.injectedJavaScriptForMainFrameOnly
+        }
         injectJavaScript={this.props.injectJavaScript}
         injectedJavaScript={this.props.injectedJavaScript}
         bounces={this.props.bounces}
         scrollEnabled={this.props.scrollEnabled}
         contentInset={this.props.contentInset}
-        allowsBackForwardNavigationGestures={this.props.allowsBackForwardNavigationGestures}
-        automaticallyAdjustContentInsets={this.props.automaticallyAdjustContentInsets}
+        allowsBackForwardNavigationGestures={
+          this.props.allowsBackForwardNavigationGestures
+        }
+        automaticallyAdjustContentInsets={
+          this.props.automaticallyAdjustContentInsets
+        }
         openNewWindowInWebView={this.props.openNewWindowInWebView}
         hideKeyboardAccessoryView={this.props.hideKeyboardAccessoryView}
-        keyboardDisplayRequiresUserAction={this.props.keyboardDisplayRequiresUserAction}
+        keyboardDisplayRequiresUserAction={
+          this.props.keyboardDisplayRequiresUserAction
+        }
         allowsLinkPreview={this.props.allowsLinkPreview}
         onLoadingStart={this._onLoadingStart}
         onLoadingFinish={this._onLoadingFinish}
@@ -361,7 +376,8 @@ class WKWebView extends React.Component {
         directionalLockEnabled={this.props.directionalLockEnabled}
         onNavigationResponse={this._onNavigationResponse}
         keyboardDismissMode={this.props.keyboardDismissMode}
-      />;
+      />
+    );
 
     return (
       <View style={styles.container}>
@@ -371,11 +387,10 @@ class WKWebView extends React.Component {
     );
   }
 
-
   forceOnLoadingChange = () => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      UIManager.RCTWKWebView.Commands.forceOnLoadingChange,
+      UIManager.CRAWKWebView.Commands.forceOnLoadingChange,
       null
     );
   };
@@ -436,7 +451,7 @@ class WKWebView extends React.Component {
       this.getWebViewHandle(),
       UIManager.CRAWKWebView.Commands.stopLoading,
       null
-    )
+    );
   };
 
   /**
@@ -449,7 +464,7 @@ class WKWebView extends React.Component {
    * document.addEventListener('message', e => { document.title = e.data; });
    * ```
    */
-  postMessage = (data) => {
+  postMessage = data => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
       UIManager.CRAWKWebView.Commands.postMessage,
@@ -457,7 +472,7 @@ class WKWebView extends React.Component {
     );
   };
 
-  evaluateJavaScript = (js) => {
+  evaluateJavaScript = js => {
     return WKWebViewManager.evaluateJavaScript(this.getWebViewHandle(), js);
   };
 
@@ -502,7 +517,7 @@ class WKWebView extends React.Component {
     onLoad && onLoad(event);
     onLoadEnd && onLoadEnd(event);
     this.setState({
-      viewState: WebViewState.IDLE,
+      viewState: WebViewState.IDLE
     });
     this._updateNavigationState(event);
   };
@@ -529,8 +544,8 @@ class WKWebView extends React.Component {
 
   _onNavigationResponse = (event: Event) => {
     const { onNavigationResponse } = this.props;
-    onNavigationResponse && onNavigationResponse(event)
-  }
+    onNavigationResponse && onNavigationResponse(event);
+  };
 }
 
 const CRAWKWebView = requireNativeComponent('CRAWKWebView', WKWebView, {
@@ -539,43 +554,43 @@ const CRAWKWebView = requireNativeComponent('CRAWKWebView', WKWebView, {
     onLoadingError: true,
     onLoadingFinish: true,
     onMessage: true,
-    messagingEnabled: PropTypes.bool,
+    messagingEnabled: PropTypes.bool
   }
 });
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: BGWASH,
+    backgroundColor: BGWASH
   },
   errorText: {
     fontSize: 14,
     textAlign: 'center',
-    marginBottom: 2,
+    marginBottom: 2
   },
   errorTextTitle: {
     fontSize: 15,
     fontWeight: '500',
-    marginBottom: 10,
+    marginBottom: 10
   },
   hidden: {
     height: 0,
-    flex: 0, // disable 'flex:1' when hiding a View
+    flex: 0 // disable 'flex:1' when hiding a View
   },
   loadingView: {
     backgroundColor: BGWASH,
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    height: 100,
+    height: 100
   },
   webView: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#ffffff'
   }
 });
 
