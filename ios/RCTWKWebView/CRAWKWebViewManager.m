@@ -80,6 +80,18 @@ RCT_EXPORT_VIEW_PROPERTY(contentInsetAdjustmentBehavior, UIScrollViewContentInse
 #endif
 RCT_EXPORT_VIEW_PROPERTY(onNavigationResponse, RCTDirectEventBlock)
 
+RCT_EXPORT_METHOD(forceOnLoadingChange:(nonnull NSNumber *)reactTag)
+{
+  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, CRAWKWebView *> *viewRegistry) {
+    CRAWKWebView *view = viewRegistry[reactTag];
+    if (![view isKindOfClass:[CRAWKWebView class]]) {
+      RCTLogError(@"Invalid view returned from registry, expecting CRAWKWebView, got: %@", view);
+    } else {
+      [view forceOnLoadingChange];
+    }
+  }];
+}
+
 RCT_EXPORT_METHOD(goBack:(nonnull NSNumber *)reactTag)
 {
   [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, CRAWKWebView *> *viewRegistry) {
